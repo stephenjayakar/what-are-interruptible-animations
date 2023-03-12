@@ -1,55 +1,38 @@
-const canvas = document.getElementById('myCanvas');
-const ctx = canvas.getContext('2d');
-const canvasLeft = canvas.offsetLeft + canvas.clientLeft,
-  canvasTop = canvas.offsetTop + canvas.clientTop;
-/* if (canvas.getContext) {
- *
- * } */
+var scene = new THREE.Scene();
 
-const Y_VELOCITY = 1;
+var width = window.innerWidth;
+var height = window.innerHeight;
 
-const RECT_WIDTH = 75;
-const RECT_HEIGHT = 75;
-function drawRect(x, y) {
-  ctx.fillRect(x, y, RECT_WIDTH, RECT_HEIGHT);
-}
-function clearRect(x, y) {
-  ctx.clearRect(x, y, RECT_WIDTH, RECT_HEIGHT);
-}
-
-canvas.addEventListener(
-  'click',
-  (event) => {
-    const x = event.pageX - canvasLeft,
-      y = event.pageY - canvasTop;
-
-    console.log(x, y);
-    if (
-      x >= rect.x &&
-      x < rect.x + RECT_WIDTH &&
-      y >= rect.y &&
-      y < rect.y + RECT_HEIGHT
-    ) {
-      // hit!
-      setInterval(() => {
-        clearRect(rect.x, rect.y);
-        rect.y += Y_VELOCITY;
-        drawRect(rect.x, rect.y);
-      }, 1000 / 120);
-    }
-
-  },
-  false
+var camera = new THREE.OrthographicCamera(
+  width / -2,
+  width / 2,
+  height / 2,
+  height / -2,
+  1,
+  1000
 );
+camera.position.set(0, 0, 500);
 
-let rect = {
-  x: 25,
-  y: 25,
-};
-drawRect(25, 25);
+var renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(width, height);
+document.body.appendChild(renderer.domElement);
 
-// WEB GL
-const webGLCanvas = document.getElementById('myCanvasWebGL');
-const gl = webGLCanvas.getContext('webgl');
-gl.clearColor(0.0, 0.0, 0.0, 1.0);
-gl.clear();
+var geometry = new THREE.PlaneGeometry(100, 100);
+var material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+
+var mesh = new THREE.Mesh(geometry, material);
+scene.add(mesh);
+
+mesh.position.x = -5;
+function render() {
+  requestAnimationFrame(render);
+
+  mesh.position.x += 0.1;
+  if (mesh.position.x > 5) {
+    mesh.position.x = -5;
+  }
+
+  renderer.render(scene, camera);
+}
+
+render();
