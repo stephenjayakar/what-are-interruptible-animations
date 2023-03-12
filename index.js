@@ -1,5 +1,5 @@
-const canvas = document.getElementById("myCanvas");
-const ctx = canvas.getContext("2d");
+const canvas = document.getElementById('myCanvas');
+const ctx = canvas.getContext('2d');
 const canvasLeft = canvas.offsetLeft + canvas.clientLeft,
   canvasTop = canvas.offsetTop + canvas.clientTop;
 /* if (canvas.getContext) {
@@ -18,7 +18,7 @@ function clearRect(x, y) {
 }
 
 canvas.addEventListener(
-  "click",
+  'click',
   (event) => {
     const x = event.pageX - canvasLeft,
       y = event.pageY - canvasTop;
@@ -47,3 +47,9 @@ let rect = {
   y: 25,
 };
 drawRect(25, 25);
+
+// WEB GL
+const webGLCanvas = document.getElementById('myCanvasWebGL');
+const gl = webGLCanvas.getContext('webgl');
+gl.clearColor(0.0, 0.0, 0.0, 1.0);
+gl.clear();
