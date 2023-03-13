@@ -1,31 +1,24 @@
-import {
-  mesh,
-  renderer,
-  scene,
-  camera,
-} from './setup';
+import { mesh, renderer, scene, camera } from "./setup";
 
-const acceleration = 9.81 / 100; // 9.81 m/s
+let acceleration = 9.81 / 100; // 9.81 m/s
 let velocity = 0;
 
 mesh.position.y = 100;
 function render() {
   requestAnimationFrame(render);
 
-  velocity += acceleration
+  velocity += acceleration;
 
   mesh.position.y -= velocity;
 
-  if (mesh.position.y < -100) {
-    resetScene()
+  if (acceleration > 0 && mesh.position.y <= 0) {
+    acceleration = -acceleration;
+  }
+  if (acceleration < 0 && mesh.position.y > 0) {
+    acceleration = -acceleration;
   }
 
   renderer.render(scene, camera);
-}
-
-function resetScene() {
-  mesh.position.y = 100;
-  velocity = 0;
 }
 
 render();
