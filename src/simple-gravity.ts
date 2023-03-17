@@ -1,21 +1,24 @@
-import { Mesh } from 'three';
+import { Mesh } from "three";
 
-// Animation state variables
-let acceleration = -9.81;
-let velocity = 0;
+class SimpleGravityAnimation {
+  velocity = 0;
+  acceleration = 0;
+  reset = (mesh: Mesh) => {
+    mesh.position.y = 200;
+    this.velocity = 0;
+    this.acceleration = -9.81 * 100;
+  };
+  render = (mesh: Mesh, timeDelta: number) => {
+    this.velocity += this.acceleration * timeDelta;
+    mesh.position.y += this.velocity * timeDelta;
 
-export default function simpleGravity(
-  mesh: Mesh,
-  timeDelta: number,
-) {
-  velocity += acceleration * timeDelta;
-
-  mesh.position.y -= velocity;
-
-  if (acceleration > 0 && mesh.position.y <= 0) {
-    acceleration = -acceleration;
-  }
-  if (acceleration < 0 && mesh.position.y > 0) {
-    acceleration = -acceleration;
-  }
+    if (this.acceleration < 0 && mesh.position.y <= 0) {
+      this.acceleration = -this.acceleration;
+    }
+    if (this.acceleration > 0 && mesh.position.y > 0) {
+      this.acceleration = -this.acceleration;
+    }
+  };
 }
+
+export default new SimpleGravityAnimation();
