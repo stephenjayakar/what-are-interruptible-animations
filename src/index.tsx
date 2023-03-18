@@ -3,45 +3,48 @@ import simpleGravity from "./simple-gravity";
 import rubberBanding from "./rubber-banding";
 import * as THREE from "three";
 import * as ReactDOM from "react-dom/client";
-import * as React from 'react';
+import * as React from "react";
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<h1>Hello, world!</h1>);
+// TODO: make this component state
+const appState: {
+  selectedAnimation: RenderClass;
+} = {
+  selectedAnimation: simpleGravity,
+};
+
+function App() {
+  return (
+    <div>
+      <p>App</p>
+      <select
+        onChange={(e) => {
+          const selectedValue = e.target.value;
+          appState.selectedAnimation = mapSelectionToFunction(selectedValue);
+          appState.selectedAnimation.reset(mesh);
+        }}
+      >
+        <option value="simple-gravity">Simple gravity</option>
+        <option value="rubber-banding">Rubber banding</option>
+      </select>
+      <button
+        id="resetButton"
+        onClick={() => {
+          appState.selectedAnimation.reset(mesh);
+        }}
+      >
+        Reset
+      </button>
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App />);
 
 interface RenderClass {
   render: (mesh: THREE.Mesh, timeDelta: number) => void;
   reset: (mesh: THREE.Mesh) => void;
 }
-const appState: {
-  selectedAnimation: RenderClass;
-}= {
-  selectedAnimation: simpleGravity,
-};
-
-document.addEventListener("DOMContentLoaded", function () {
-  const selectElement = document.getElementById("selectElement") as any;
-
-  // Function to handle the select change
-  function onSelectChange() {
-    const selectedValue = selectElement.value;
-    appState.selectedAnimation = mapSelectionToFunction(selectedValue);
-    appState.selectedAnimation.reset(mesh);
-  }
-
-  // Attach the change event listener to the select element
-  selectElement.addEventListener("change", onSelectChange);
-
-  const resetButtonElement = document.getElementById("resetButton") as any;
-
-  resetButtonElement.addEventListener("click", () => {
-    // TODO: this is a good example of using something
-    // class-oriented. Make each animation a class to
-    // encapsulate state, as well as an interface.
-    // The interface would be "Reset()" and "RenderNext(mesh, delta)"
-      appState.selectedAnimation.reset(mesh);
-  });
-  appState.selectedAnimation.reset(mesh);
-});
 
 const clock = new THREE.Clock();
 
