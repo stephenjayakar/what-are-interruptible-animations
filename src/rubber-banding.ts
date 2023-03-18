@@ -7,9 +7,11 @@ enum ANIM_STATE {
 
 // Consts
 const floorY = -100;
-const mass = 100;
-const k = 10;
-const damping = 0.9;
+const mass = 1.5;
+const k = 8;
+// Critical damping
+const c = 2 * Math.sqrt(mass * k);
+
 // const ceilY = 200;
 // const EPS = 0.0000001;
 
@@ -31,22 +33,17 @@ class RubberBandingAnimation {
       // Check if the square has hit the floor and apply rubber banding
       if (mesh.position.y <= floorY) {
         this.anim_state = ANIM_STATE.BANDING;
+        this.acceleration = 0;
       }
     } else {
       /// f = m * a
-      const currentF = mass * this.acceleration;
+      // const currentF = mass * this.acceleration;
       const x = floorY - mesh.position.y;
       let springF = k * x;
-      // TODO: how to do damping properly?
-      // springF -= springF * damping;
-      const F = (currentF + springF);
+      const dampingF = c * this.velocity;
+      const F = springF - dampingF;
       const a = F / mass;
       this.acceleration = a;
-      console.log({
-        a,
-        currentF,
-        springF,
-      });
     }
   };
 }
