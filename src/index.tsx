@@ -2,6 +2,11 @@ import { mesh, renderer, scene, camera } from "./setup";
 import simpleGravity from "./simple-gravity";
 import rubberBanding from "./rubber-banding";
 import * as THREE from "three";
+import * as ReactDOM from "react-dom/client";
+import * as React from 'react';
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<h1>Hello, world!</h1>);
 
 interface RenderClass {
   render: (mesh: THREE.Mesh, timeDelta: number) => void;

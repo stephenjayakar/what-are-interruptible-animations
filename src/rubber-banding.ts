@@ -46,6 +46,16 @@ class RubberBandingAnimation {
       this.acceleration = a;
     }
   };
+
+  // updateConfig = (
+//   config: {
+//     k: number;
+//     c: number;
+//     mass: number;
+//   },
+// ) => {
+//   
+// }
 }
 
 export default new RubberBandingAnimation();
