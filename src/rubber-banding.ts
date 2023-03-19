@@ -7,9 +7,6 @@ enum ANIM_STATE {
 
 // Consts
 const floorY = -100;
-// const mass = 1.5;
-const k = 8;
-
 // const ceilY = 200;
 // const EPS = 0.0000001;
 
@@ -18,8 +15,9 @@ class RubberBandingAnimation {
   velocity = 0;
   anim_state = ANIM_STATE.FALLING;
   mass = 1.5;
+  k = 8;
   // Critical damping
-  c = 2 * Math.sqrt(this.mass * k);
+  c = 2 * Math.sqrt(this.mass * this.k);
   reset = (mesh: Mesh) => {
     mesh.position.y = 200;
     this.velocity = 0;
@@ -40,7 +38,7 @@ class RubberBandingAnimation {
       /// f = m * a
       // const currentF = mass * this.acceleration;
       const x = floorY - mesh.position.y;
-      let springF = k * x;
+      let springF = this.k * x;
       const dampingF = this.c * this.velocity;
       const F = springF - dampingF;
       const a = F / this.mass;
@@ -48,11 +46,19 @@ class RubberBandingAnimation {
     }
   };
 
-  updateConfig = (config: { mass: number }) => {
-    this.mass = config.mass;
+  updateConfig = (config: {
+    mass?: number,
+    k?: number,
+  }) => {
+    if (config.mass) {
+      this.mass = config.mass;
+    }
+    if (config.k) {
+      this.k = config.k
+    }
     // TODO: find a more elegant way to recalc
-    this.c = 2 * Math.sqrt(this.mass * k);
-    console.log(this.mass, this.c);
+    this.c = 2 * Math.sqrt(this.mass * this.k);
+    console.log(this.mass, this.k, this.c);
   };
 
   // updateConfig = (

@@ -24,7 +24,7 @@ function App() {
     setSliderValue(floatValue);
   }
   const [animationString, setAnimationString] = React.useState(SIMPLE_GRAVITY);
-  const [sliderValue, setSliderValue] = React.useState(0.0);
+  const [sliderValue, setSliderValue] = React.useState(1.5);
   return (
     <div>
       <p>{animationString}</p>
@@ -32,7 +32,7 @@ function App() {
         onChange={(e) => {
           const selectedValue = e.target.value;
           appState.selectedAnimation = mapSelectionToFunction(selectedValue);
-          appState.selectedAnimation.reset(mesh);
+          appState.selectedAnimation.reset(mesh, { mass: sliderValue });
           setAnimationString(selectedValue);
         }}
       >
@@ -47,14 +47,18 @@ function App() {
       >
         Reset
       </button>
-      {animationString == RUBBER_BANDING &&       <><h3>Slider 1: {sliderValue}</h3>
-      <input
-        type="range"
-        min="1"
-        max="100"
-        value={sliderValue * 10}
-        onChange={(e) => handleSliderChange(e.target.value)}
-      /></>}
+      {animationString == RUBBER_BANDING && (
+        <>
+          <h3>Mass: {sliderValue}</h3>
+          <input
+            type="range"
+            min="1"
+            max="100"
+            value={sliderValue * 10}
+            onChange={(e) => handleSliderChange(e.target.value)}
+          />
+        </>
+      )}
     </div>
   );
 }
@@ -64,7 +68,7 @@ root.render(<App />);
 
 interface RenderClass {
   render: (mesh: THREE.Mesh, timeDelta: number) => void;
-  reset: (mesh: THREE.Mesh) => void;
+  reset: (mesh: THREE.Mesh, config?: any) => void;
   updateConfig: (config: any) => void;
 }
 
