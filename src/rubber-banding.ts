@@ -7,10 +7,8 @@ enum ANIM_STATE {
 
 // Consts
 const floorY = -100;
-const mass = 1.5;
+// const mass = 1.5;
 const k = 8;
-// Critical damping
-const c = 2 * Math.sqrt(mass * k);
 
 // const ceilY = 200;
 // const EPS = 0.0000001;
@@ -19,6 +17,9 @@ class RubberBandingAnimation {
   acceleration = 0;
   velocity = 0;
   anim_state = ANIM_STATE.FALLING;
+  mass = 1.5;
+  // Critical damping
+  c = 2 * Math.sqrt(this.mass * k);
   reset = (mesh: Mesh) => {
     mesh.position.y = 200;
     this.velocity = 0;
@@ -40,22 +41,29 @@ class RubberBandingAnimation {
       // const currentF = mass * this.acceleration;
       const x = floorY - mesh.position.y;
       let springF = k * x;
-      const dampingF = c * this.velocity;
+      const dampingF = this.c * this.velocity;
       const F = springF - dampingF;
-      const a = F / mass;
+      const a = F / this.mass;
       this.acceleration = a;
     }
   };
 
+  updateConfig = (config: { mass: number }) => {
+    this.mass = config.mass;
+    // TODO: find a more elegant way to recalc
+    this.c = 2 * Math.sqrt(this.mass * k);
+    console.log(this.mass, this.c);
+  };
+
   // updateConfig = (
-//   config: {
-//     k: number;
-//     c: number;
-//     mass: number;
-//   },
-// ) => {
-//   
-// }
+  //   config: {
+  //     k: number;
+  //     c: number;
+  //     mass: number;
+  //   },
+  // ) => {
+  //
+  // }
 }
 
 export default new RubberBandingAnimation();

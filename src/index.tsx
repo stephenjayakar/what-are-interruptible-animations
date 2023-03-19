@@ -5,6 +5,9 @@ import * as THREE from "three";
 import * as ReactDOM from "react-dom/client";
 import * as React from "react";
 
+const SIMPLE_GRAVITY = "simple-gravity";
+const RUBBER_BANDING = "rubber-banding";
+
 // TODO: make this component state
 const appState: {
   selectedAnimation: RenderClass;
@@ -13,18 +16,27 @@ const appState: {
 };
 
 function App() {
+  function handleSliderChange(value: number) {
+    appState.selectedAnimation.updateConfig({
+      mass: value,
+    });
+    setSliderValue(value);
+  }
+  const [animationString, setAnimationString] = React.useState(SIMPLE_GRAVITY);
+  const [sliderValue, setSliderValue] = React.useState(0);
   return (
     <div>
-      <p>App</p>
+      <p>{animationString}</p>
       <select
         onChange={(e) => {
           const selectedValue = e.target.value;
           appState.selectedAnimation = mapSelectionToFunction(selectedValue);
           appState.selectedAnimation.reset(mesh);
+          setAnimationString(selectedValue);
         }}
       >
-        <option value="simple-gravity">Simple gravity</option>
-        <option value="rubber-banding">Rubber banding</option>
+        <option value={SIMPLE_GRAVITY}>Simple gravity</option>
+        <option value={RUBBER_BANDING}>Rubber banding</option>
       </select>
       <button
         id="resetButton"
@@ -34,6 +46,14 @@ function App() {
       >
         Reset
       </button>
+      {animationString == RUBBER_BANDING &&       <><h3>Slider 1: {sliderValue}</h3>
+      <input
+        type="range"
+        min="0"
+        max="100"
+        value={sliderValue}
+        onChange={(e) => handleSliderChange(parseInt(e.target.value))}
+      /></>}
     </div>
   );
 }
@@ -44,6 +64,7 @@ root.render(<App />);
 interface RenderClass {
   render: (mesh: THREE.Mesh, timeDelta: number) => void;
   reset: (mesh: THREE.Mesh) => void;
+  updateConfig: (config: any) => void;
 }
 
 const clock = new THREE.Clock();
@@ -57,9 +78,9 @@ renderer.setAnimationLoop(() => {
 });
 
 function mapSelectionToFunction(input: string): any {
-  if (input == "simple-gravity") {
+  if (input == SIMPLE_GRAVITY) {
     return simpleGravity;
-  } else if (input == "rubber-banding") {
+  } else if (input == RUBBER_BANDING) {
     return rubberBanding;
   } else {
     console.log("error on mapping, returning default. got ", input);
