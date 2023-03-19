@@ -16,14 +16,15 @@ const appState: {
 };
 
 function App() {
-  function handleSliderChange(value: number) {
+  function handleSliderChange(value: string) {
+    const floatValue = parseInt(value) / 10;
     appState.selectedAnimation.updateConfig({
-      mass: value,
+      mass: floatValue,
     });
-    setSliderValue(value);
+    setSliderValue(floatValue);
   }
   const [animationString, setAnimationString] = React.useState(SIMPLE_GRAVITY);
-  const [sliderValue, setSliderValue] = React.useState(0);
+  const [sliderValue, setSliderValue] = React.useState(0.0);
   return (
     <div>
       <p>{animationString}</p>
@@ -49,10 +50,10 @@ function App() {
       {animationString == RUBBER_BANDING &&       <><h3>Slider 1: {sliderValue}</h3>
       <input
         type="range"
-        min="0"
+        min="1"
         max="100"
-        value={sliderValue}
-        onChange={(e) => handleSliderChange(parseInt(e.target.value))}
+        value={sliderValue * 10}
+        onChange={(e) => handleSliderChange(e.target.value)}
       /></>}
     </div>
   );
