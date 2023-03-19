@@ -16,15 +16,23 @@ const appState: {
 };
 
 function App() {
-  function handleSliderChange(value: string) {
+  const [animationString, setAnimationString] = React.useState(SIMPLE_GRAVITY);
+  const [massSliderValue, setMassSliderValue] = React.useState(1.5);
+  const [kSliderValue, setKSliderValue] = React.useState(8.0);
+  // TODO: this is spaghetti :>.
+  const sliderMap = {
+    mass: setMassSliderValue,
+    k: setKSliderValue,
+  };
+
+  function handleSliderChange(value: string, key: "mass" | "k") {
     const floatValue = parseInt(value) / 10;
     appState.selectedAnimation.updateConfig({
-      mass: floatValue,
+      [key]: floatValue,
     });
-    setSliderValue(floatValue);
+    sliderMap[key](floatValue);
   }
-  const [animationString, setAnimationString] = React.useState(SIMPLE_GRAVITY);
-  const [sliderValue, setSliderValue] = React.useState(1.5);
+
   return (
     <div>
       <p>{animationString}</p>
@@ -32,7 +40,7 @@ function App() {
         onChange={(e) => {
           const selectedValue = e.target.value;
           appState.selectedAnimation = mapSelectionToFunction(selectedValue);
-          appState.selectedAnimation.reset(mesh, { mass: sliderValue });
+          appState.selectedAnimation.reset(mesh, { mass: massSliderValue });
           setAnimationString(selectedValue);
         }}
       >
@@ -49,13 +57,21 @@ function App() {
       </button>
       {animationString == RUBBER_BANDING && (
         <>
-          <h3>Mass: {sliderValue}</h3>
+          <h3>Mass: {massSliderValue}</h3>
           <input
             type="range"
             min="1"
-            max="100"
-            value={sliderValue * 10}
-            onChange={(e) => handleSliderChange(e.target.value)}
+            max="200"
+            value={massSliderValue * 10}
+            onChange={(e) => handleSliderChange(e.target.value, "mass")}
+          />
+          <h3>K: {kSliderValue}</h3>
+          <input
+            type="range"
+            min="1"
+            max="200"
+            value={kSliderValue * 10}
+            onChange={(e) => handleSliderChange(e.target.value, "k")}
           />
         </>
       )}
