@@ -19,6 +19,8 @@ class SimpleGravityAnimation {
       this.acceleration = -this.acceleration;
     }
   };
+
+  updateConfig = (_:any) => {};
 }
 
 export default new SimpleGravityAnimation();
