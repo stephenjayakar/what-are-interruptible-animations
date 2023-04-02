@@ -12,10 +12,11 @@ const TextTexture = ({ text, color, bgColor }: TextTextureProps) => {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d") as CanvasRenderingContext2D;
 
-  const fontSize = 40;
+  const fontSize = 80; // Increase the font size
+  const scaleFactor = 2; // Add scale factor
   context.font = `${fontSize}px Arial`;
-  canvas.width = context.measureText(text).width;
-  canvas.height = fontSize * 1.5;
+  canvas.width = context.measureText(text).width * scaleFactor;
+  canvas.height = fontSize * 1.5 * scaleFactor;
 
   context.fillStyle = bgColor;
   context.fillRect(0, 0, canvas.width, canvas.height);
@@ -23,9 +24,41 @@ const TextTexture = ({ text, color, bgColor }: TextTextureProps) => {
   context.fillStyle = color;
   context.font = `${fontSize}px Arial`;
   context.textBaseline = "top";
+  context.scale(scaleFactor, scaleFactor); // Apply scale
   context.fillText(text, 0, 0);
 
   return new THREE.CanvasTexture(canvas);
+};
+
+interface TableProps {
+  data: DataEntry[];
+  isDragging: boolean;
+  scrollY: number;
+  setScrollY: (scrollY: number) => void;
+}
+
+const Table = ({ data, isDragging, scrollY, setScrollY }: TableProps) => {
+  useFrame(() => {
+    if (!isDragging) {
+      if (scrollY < 3) {
+        setScrollY(3);
+      }
+    }
+  });
+  return (
+    <>
+      {data.map((row, index) => (
+        <TableRow
+          key={row.id}
+          text={`${row.id} ${row.name} ${row.age}`}
+          position={[0, index * -2 + scrollY, 0]}
+          color={"black"}
+          bgColor={index % 2 === 0 ? "white" : "lightgray"}
+          onClick={() => console.log(`Clicked row: ${JSON.stringify(row)}`)}
+        />
+      ))}
+    </>
+  );
 };
 
 interface TableRowProps {
@@ -46,15 +79,9 @@ const TableRow: React.FC<TableRowProps> = ({
   const textTexture = TextTexture({ text, color, bgColor });
   const meshRef = useRef<THREE.Mesh>(null);
 
-  useFrame(() => {
-    if (meshRef.current) {
-      // Remove rotation
-    }
-  });
-
   return (
     <mesh ref={meshRef} position={position} onClick={onClick}>
-      <boxGeometry args={[4, 1, 0.1]} />
+      <planeGeometry args={[4, 1]} />
       <meshStandardMaterial map={textTexture} color={bgColor} />
     </mesh>
   );
@@ -67,9 +94,9 @@ interface DataEntry {
 }
 
 const Scrollable3DTable: React.FC = () => {
-  const [scrollY, setScrollY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [startY, setStartY] = useState(0);
+  const [scrollY, setScrollY] = useState(0);
 
   const handlePointerDown = (e: React.PointerEvent) => {
     setIsDragging(true);
@@ -86,12 +113,15 @@ const Scrollable3DTable: React.FC = () => {
 
   const handlePointerUp = () => {
     setIsDragging(false);
+    console.log(scrollY);
   };
 
   const data: DataEntry[] = [
     { id: 1, name: "Alice", age: 30 },
     { id: 2, name: "Bob", age: 25 },
     { id: 3, name: "Charlie", age: 35 },
+    { id: 4, name: "Meow", age: 35 },
+    { id: 5, name: "Meowmeow", age: 37 },
     // Add more data here as needed
   ];
 
@@ -106,16 +136,12 @@ const Scrollable3DTable: React.FC = () => {
       <Canvas>
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} />
-        {data.map((row, index) => (
-          <TableRow
-            key={row.id}
-            text={`${row.id} ${row.name} ${row.age}`}
-            position={[0, index * -2 + scrollY, 0]}
-            color={"black"}
-            bgColor={index % 2 === 0 ? "white" : "lightgray"}
-            onClick={() => console.log(`Clicked row: ${JSON.stringify(row)}`)}
-          />
-        ))}
+        <Table
+          data={data}
+          scrollY={scrollY}
+          setScrollY={setScrollY}
+          isDragging={isDragging}
+        />
       </Canvas>
     </div>
   );
