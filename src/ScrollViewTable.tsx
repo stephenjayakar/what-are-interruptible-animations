@@ -48,7 +48,7 @@ let acceleration = 0;
 
 const Table = ({ data, isDragging, scrollY, setScrollY }: TableProps) => {
   useFrame(() => {
-    if (!isDragging && scrollY > ceilY) {
+    if (!isDragging && scrollY < ceilY) {
       const x = scrollY - ceilY;
       const springF = k * x;
       const dampingF = c * velocity;
