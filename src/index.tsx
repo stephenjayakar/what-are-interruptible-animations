@@ -1,12 +1,16 @@
 import { mesh, renderer, scene, camera } from "./setup";
 import simpleGravity from "./simple-gravity";
 import rubberBanding from "./rubber-banding";
+// import scrollview from "./scrollview";
 import * as THREE from "three";
 import * as ReactDOM from "react-dom/client";
 import * as React from "react";
 
+import ScrollViewTable from "./ScrollViewTable";
+
 const SIMPLE_GRAVITY = "simple-gravity";
 const RUBBER_BANDING = "rubber-banding";
+const SCROLLVIEW = "scroll-view";
 
 // TODO: make this component state
 const appState: {
@@ -17,8 +21,8 @@ const appState: {
 
 function App() {
   const [animationString, setAnimationString] = React.useState(SIMPLE_GRAVITY);
-  const [massSliderValue, setMassSliderValue] = React.useState(1.5);
-  const [kSliderValue, setKSliderValue] = React.useState(8.0);
+  const [massSliderValue, setMassSliderValue] = React.useState(1);
+  const [kSliderValue, setKSliderValue] = React.useState(100);
   // TODO: this is spaghetti :>.
   const sliderMap = {
     mass: setMassSliderValue,
@@ -46,6 +50,7 @@ function App() {
       >
         <option value={SIMPLE_GRAVITY}>Simple gravity</option>
         <option value={RUBBER_BANDING}>Rubber banding</option>
+        <option value={SCROLLVIEW}>Scrollview</option>
       </select>
       <button
         id="resetButton"
@@ -75,6 +80,7 @@ function App() {
           />
         </>
       )}
+      <ScrollViewTable />
     </div>
   );
 }
@@ -103,6 +109,9 @@ function mapSelectionToFunction(input: string): any {
     return simpleGravity;
   } else if (input == RUBBER_BANDING) {
     return rubberBanding;
+  } else if (input == SCROLLVIEW) {
+    // TODO: scrollview
+    return null;
   } else {
     console.log("error on mapping, returning default. got ", input);
     return simpleGravity;
