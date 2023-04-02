@@ -55,13 +55,6 @@ const Table = ({ data, isDragging, scrollY, setScrollY }: TableProps) => {
       const F = springF - dampingF;
       const a = F / m;
       acceleration = a;
-      console.log({
-        x,
-        springF,
-        F,
-        acceleration,
-        velocity,
-      });
 
       // Set the position
       const timeDelta = clock.getDelta();
