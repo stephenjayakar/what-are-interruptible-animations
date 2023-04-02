@@ -37,21 +37,46 @@ interface TableProps {
   setScrollY: (scrollY: number) => void;
 }
 
+const m = 1;
+const k = 10;
+const c = 2 * Math.sqrt(m * k);
+const ceilY = 3;
+// TODO: Uhhhh
+const clock = new THREE.Clock();
+let velocity = 0;
+let acceleration = 0;
+
 const Table = ({ data, isDragging, scrollY, setScrollY }: TableProps) => {
   useFrame(() => {
-    if (!isDragging) {
-      if (scrollY < 3) {
-        setScrollY(3);
-      }
+    if (!isDragging && scrollY > ceilY) {
+      const x = scrollY - ceilY;
+      const springF = k * x;
+      const dampingF = c * velocity;
+      const F = springF - dampingF;
+      const a = F / m;
+      acceleration = a;
+      console.log({
+        x,
+        springF,
+        F,
+        acceleration,
+        velocity,
+      });
+
+      // Set the position
+      const timeDelta = clock.getDelta();
+      velocity += -acceleration * timeDelta;
+      setScrollY(velocity * timeDelta + scrollY);
     }
   });
+
   return (
     <>
       {data.map((row, index) => (
         <TableRow
           key={row.id}
           text={`${row.id} ${row.name} ${row.age}`}
-          position={[0, index * -2 + scrollY, 0]}
+          position={[0, index * -1 + scrollY, 0]}
           color={"black"}
           bgColor={index % 2 === 0 ? "white" : "lightgray"}
           onClick={() => console.log(`Clicked row: ${JSON.stringify(row)}`)}
@@ -114,6 +139,11 @@ const Scrollable3DTable: React.FC = () => {
   const handlePointerUp = () => {
     setIsDragging(false);
     console.log(scrollY);
+
+    // TODO: Uhhhhh
+    clock.getDelta();
+    velocity = 0;
+    acceleration = 0;
   };
 
   const data: DataEntry[] = [
