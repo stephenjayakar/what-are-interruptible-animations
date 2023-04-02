@@ -1,6 +1,6 @@
-import React, { useRef, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import * as THREE from 'three';
+import React, { useRef, useState } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
+import * as THREE from "three";
 
 interface TextTextureProps {
   text: string;
@@ -9,8 +9,8 @@ interface TextTextureProps {
 }
 
 const TextTexture = ({ text, color, bgColor }: TextTextureProps) => {
-  const canvas = document.createElement('canvas');
-  const context = canvas.getContext('2d') as CanvasRenderingContext2D;
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d") as CanvasRenderingContext2D;
 
   const fontSize = 40;
   context.font = `${fontSize}px Arial`;
@@ -22,7 +22,7 @@ const TextTexture = ({ text, color, bgColor }: TextTextureProps) => {
 
   context.fillStyle = color;
   context.font = `${fontSize}px Arial`;
-  context.textBaseline = 'top';
+  context.textBaseline = "top";
   context.fillText(text, 0, 0);
 
   return new THREE.CanvasTexture(canvas);
@@ -36,7 +36,13 @@ interface TableRowProps {
   onClick: () => void;
 }
 
-const TableRow: React.FC<TableRowProps> = ({ text, position, color, bgColor, onClick }) => {
+const TableRow: React.FC<TableRowProps> = ({
+  text,
+  position,
+  color,
+  bgColor,
+  onClick,
+}) => {
   const textTexture = TextTexture({ text, color, bgColor });
   const meshRef = useRef<THREE.Mesh>(null);
 
@@ -62,23 +68,40 @@ interface DataEntry {
 
 const Scrollable3DTable: React.FC = () => {
   const [scrollY, setScrollY] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startY, setStartY] = useState(0);
 
-  const handleTouchMove = (e: React.TouchEvent) => {
-    const deltaY = e.changedTouches[0].clientY - scrollY;
-    setScrollY((prevScrollY) => prevScrollY + deltaY * 0.01);
+  const handlePointerDown = (e: React.PointerEvent) => {
+    setIsDragging(true);
+    setStartY(e.clientY);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (isDragging) {
+      const deltaY = e.clientY - startY;
+      setScrollY((prevScrollY) => prevScrollY - deltaY * 0.01);
+      setStartY(e.clientY);
+    }
+  };
+
+  const handlePointerUp = () => {
+    setIsDragging(false);
   };
 
   const data: DataEntry[] = [
-    { id: 1, name: 'Alice', age: 30 },
-    { id: 2, name: 'Bob', age: 25 },
-    { id: 3, name: 'Charlie', age: 35 },
+    { id: 1, name: "Alice", age: 30 },
+    { id: 2, name: "Bob", age: 25 },
+    { id: 3, name: "Charlie", age: 35 },
     // Add more data here as needed
   ];
 
   return (
     <div
-      onTouchMove={handleTouchMove}
-      style={{ width: '100vw', height: '100vh' }}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerUp}
+      style={{ width: "100vw", height: "100vh" }}
     >
       <Canvas>
         <ambientLight intensity={0.5} />
@@ -88,8 +111,8 @@ const Scrollable3DTable: React.FC = () => {
             key={row.id}
             text={`${row.id} ${row.name} ${row.age}`}
             position={[0, index * -2 + scrollY, 0]}
-            color={'black'}
-            bgColor={index % 2 === 0 ? 'white' : 'lightgray'}
+            color={"black"}
+            bgColor={index % 2 === 0 ? "white" : "lightgray"}
             onClick={() => console.log(`Clicked row: ${JSON.stringify(row)}`)}
           />
         ))}
@@ -98,4 +121,4 @@ const Scrollable3DTable: React.FC = () => {
   );
 };
 
-export default Scrollable3DTable
+export default Scrollable3DTable;
