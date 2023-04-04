@@ -1,5 +1,5 @@
 import rubberBanding from "./rubber-banding";
-import settingsImage from "./images/merged.png"
+import settingsImage from "./images/merged.png";
 import * as THREE from "three";
 import * as ReactDOM from "react-dom/client";
 import * as React from "react";
@@ -21,6 +21,7 @@ var camera = new THREE.OrthographicCamera(
 );
 camera.position.set(0, 0, 500);
 
+const clock = new THREE.Clock();
 var renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(width, height);
 document.body.appendChild(renderer.domElement);
@@ -28,23 +29,23 @@ document.body.appendChild(renderer.domElement);
 const textureLoader = new THREE.TextureLoader();
 var mesh: THREE.Mesh | null = null;
 textureLoader.load(settingsImage, (texture) => {
-
   const textureHeight = 4197 / 2;
-    var geometry = new THREE.PlaneGeometry(width, textureHeight);
-    var material = new THREE.MeshBasicMaterial({ map: texture });
+  var geometry = new THREE.PlaneGeometry(width, textureHeight);
+  var material = new THREE.MeshBasicMaterial({ map: texture });
 
-    mesh = new THREE.Mesh(geometry, material);
-    scene.add(mesh);
-    const clock = new THREE.Clock();
+  mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
 
-    renderer.setAnimationLoop(() => {
-        const f = appState.selectedAnimation.render;
-        // Calculate delta as close to func call
-        const timeDelta = clock.getDelta();
-        f(mesh, timeDelta);
-        renderer.render(scene, camera);
-});});
-
+  renderer.setAnimationLoop(() => {
+    if (!isBeingDragged) {
+      const f = appState.selectedAnimation.render;
+      // Calculate delta as close to func call
+      const timeDelta = clock.getDelta();
+      f(mesh, timeDelta);
+      renderer.render(scene, camera);
+    }
+  });
+});
 
 // TODO: make this component state
 const appState: {
@@ -81,24 +82,24 @@ function App() {
       >
         Reset
       </button>
-        <>
-          <h3>Mass: {massSliderValue}</h3>
-          <input
-            type="range"
-            min="1"
-            max="200"
-            value={massSliderValue * 10}
-            onChange={(e) => handleSliderChange(e.target.value, "mass")}
-          />
-          <h3>K: {kSliderValue}</h3>
-          <input
-            type="range"
-            min="1"
-            max="200"
-            value={kSliderValue * 10}
-            onChange={(e) => handleSliderChange(e.target.value, "k")}
-          />
-        </>
+      <>
+        <h3>Mass: {massSliderValue}</h3>
+        <input
+          type="range"
+          min="1"
+          max="200"
+          value={massSliderValue * 10}
+          onChange={(e) => handleSliderChange(e.target.value, "mass")}
+        />
+        <h3>K: {kSliderValue}</h3>
+        <input
+          type="range"
+          min="1"
+          max="200"
+          value={kSliderValue * 10}
+          onChange={(e) => handleSliderChange(e.target.value, "k")}
+        />
+      </>
     </div>
   );
 }
@@ -106,9 +107,30 @@ function App() {
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(<App />);
 
-renderer.domElement.addEventListener('mousedown', (event) => {
-  console.log(event)
-}, false);
+let isBeingDragged = false;
+// Mouse down event
+const onMouseDown = (event: MouseEvent) => {
+  isBeingDragged = true;
+  console.log("Mouse down:", event);
+};
+
+// Mouse up event
+const onMouseUp = (event: MouseEvent) => {
+  isBeingDragged = false;
+  console.log("Mouse up:", event);
+  clock.getDelta();
+};
+
+// Mouse move event
+const onMouseMove = (event: MouseEvent) => {
+  if (isBeingDragged) {
+    console.log("Mouse dragging:", event);
+  }
+};
+
+renderer.domElement.addEventListener("mousedown", onMouseDown, false);
+renderer.domElement.addEventListener("mouseup", onMouseUp, false);
+renderer.domElement.addEventListener("mousemove", onMouseMove, false);
 
 interface RenderClass {
   render: (mesh: THREE.Mesh, timeDelta: number) => void;
