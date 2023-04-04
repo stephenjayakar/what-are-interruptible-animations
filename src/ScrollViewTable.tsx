@@ -59,7 +59,12 @@ const Table = ({ data, isDragging, scrollY, setScrollY }: TableProps) => {
       // Set the position
       const timeDelta = clock.getDelta();
       velocity += -acceleration * timeDelta;
-      setScrollY(velocity * timeDelta + scrollY);
+
+      let nextY = velocity * timeDelta + scrollY;
+      if (nextY > ceilY) {
+        nextY = ceilY;
+      }
+      setScrollY(nextY);
     }
   });
 
