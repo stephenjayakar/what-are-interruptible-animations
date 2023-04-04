@@ -5,27 +5,6 @@ enum ANIM_STATE {
   BANDING,
 }
 
-function onDocumentMouseDown( event: any ) {
-
-  console.log(event);
-    // event.preventDefault();
-
-    // mouse.x = ( event.clientX / renderer.domElement.clientWidth ) * 2 - 1;
-    // mouse.y = - ( event.clientY / renderer.domElement.clientHeight ) * 2 + 1;
-
-    // raycaster.setFromCamera( mouse, camera );
-
-    // var intersects = raycaster.intersectObjects( objects ); 
-
-    // if ( intersects.length > 0 ) {
-
-    //     intersects[0].object.callback();
-
-    // }
-
-}
-
-
 // Consts
 const floorY = -400;
 // const ceilY = 200;
@@ -40,7 +19,7 @@ class RubberBandingAnimation {
   acceleration = 0;
   velocity = 0;
   anim_state = ANIM_STATE.FALLING;
-  mass = 1.5;
+  mass = 0.1;
   k = 8;
   // Critical damping
   c = 2 * Math.sqrt(this.mass * this.k);

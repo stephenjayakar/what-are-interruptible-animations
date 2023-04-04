@@ -46,8 +46,8 @@ textureLoader.load(settingsImage, (texture) => {
 });
 
 function App() {
-  const [massSliderValue, setMassSliderValue] = React.useState(1);
-  const [kSliderValue, setKSliderValue] = React.useState(100);
+  const [massSliderValue, setMassSliderValue] = React.useState(0.1);
+  const [kSliderValue, setKSliderValue] = React.useState(8);
   // TODO: this is spaghetti :>.
   const sliderMap = {
     mass: setMassSliderValue,
@@ -98,17 +98,19 @@ function App() {
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(<App />);
 
-let isBeingDragged = false;
+let isDragging = false;
+let startY = 0;
 // Mouse down event
 const onMouseDown = (event: MouseEvent) => {
-  isBeingDragged = true;
+  isDragging = true;
   f = emptyRenderMethod;
+  startY = event.clientY;
   console.log("Mouse down:", event);
 };
 
 // Mouse up event
 const onMouseUp = (event: MouseEvent) => {
-  isBeingDragged = false;
+  isDragging = false;
   console.log("Mouse up:", event);
   f = rubberBanding.render;
   clock.getDelta();
@@ -116,8 +118,10 @@ const onMouseUp = (event: MouseEvent) => {
 
 // Mouse move event
 const onMouseMove = (event: MouseEvent) => {
-  if (isBeingDragged) {
-    console.log("Mouse dragging:", event);
+  if (isDragging) {
+    const deltaY = event.clientY - startY;
+    mesh.position.y = mesh.position.y - deltaY;
+    startY = event.clientY;
   }
 };
 
