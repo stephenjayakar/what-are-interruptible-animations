@@ -1,26 +1,59 @@
-import { mesh, renderer, scene, camera } from "./setup";
-import simpleGravity from "./simple-gravity";
 import rubberBanding from "./rubber-banding";
-// import scrollview from "./scrollview";
+import settingsImage from "./images/merged.png"
 import * as THREE from "three";
 import * as ReactDOM from "react-dom/client";
 import * as React from "react";
 
-import ScrollViewTable from "./ScrollViewTable";
+// SETUP
+var scene = new THREE.Scene();
 
-const SIMPLE_GRAVITY = "simple-gravity";
-const RUBBER_BANDING = "rubber-banding";
-const SCROLLVIEW = "scroll-view";
+var width = 1170 / 2;
+// 19.5 / 9
+var height = 4197 / 2;
+
+var camera = new THREE.OrthographicCamera(
+  width / -2,
+  width / 2,
+  height / 2,
+  height / -2,
+  1,
+  1000
+);
+camera.position.set(0, 0, 500);
+
+var renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(width, height);
+document.body.appendChild(renderer.domElement);
+
+const textureLoader = new THREE.TextureLoader();
+var mesh: THREE.Mesh | null = null;
+textureLoader.load(settingsImage, (texture) => {
+
+  
+    var geometry = new THREE.PlaneGeometry(width, height);
+    var material = new THREE.MeshBasicMaterial({ map: texture });
+
+    mesh = new THREE.Mesh(geometry, material);
+    scene.add(mesh);
+    const clock = new THREE.Clock();
+
+    renderer.setAnimationLoop(() => {
+        const f = appState.selectedAnimation.render;
+        // Calculate delta as close to func call
+        const timeDelta = clock.getDelta();
+        f(mesh, timeDelta);
+        renderer.render(scene, camera);
+});});
+
 
 // TODO: make this component state
 const appState: {
   selectedAnimation: RenderClass;
 } = {
-  selectedAnimation: simpleGravity,
+  selectedAnimation: rubberBanding,
 };
 
 function App() {
-  const [animationString, setAnimationString] = React.useState(SIMPLE_GRAVITY);
   const [massSliderValue, setMassSliderValue] = React.useState(1);
   const [kSliderValue, setKSliderValue] = React.useState(100);
   // TODO: this is spaghetti :>.
@@ -39,19 +72,7 @@ function App() {
 
   return (
     <div>
-      <p>{animationString}</p>
-      <select
-        onChange={(e) => {
-          const selectedValue = e.target.value;
-          appState.selectedAnimation = mapSelectionToFunction(selectedValue);
-          appState.selectedAnimation.reset(mesh, { mass: massSliderValue });
-          setAnimationString(selectedValue);
-        }}
-      >
-        <option value={SIMPLE_GRAVITY}>Simple gravity</option>
-        <option value={RUBBER_BANDING}>Rubber banding</option>
-        <option value={SCROLLVIEW}>Scrollview</option>
-      </select>
+      <p>Rubber banding demo</p>
       <button
         id="resetButton"
         onClick={() => {
@@ -60,7 +81,6 @@ function App() {
       >
         Reset
       </button>
-      {animationString == RUBBER_BANDING && (
         <>
           <h3>Mass: {massSliderValue}</h3>
           <input
@@ -79,8 +99,6 @@ function App() {
             onChange={(e) => handleSliderChange(e.target.value, "k")}
           />
         </>
-      )}
-      <ScrollViewTable />
     </div>
   );
 }
@@ -92,28 +110,4 @@ interface RenderClass {
   render: (mesh: THREE.Mesh, timeDelta: number) => void;
   reset: (mesh: THREE.Mesh, config?: any) => void;
   updateConfig: (config: any) => void;
-}
-
-const clock = new THREE.Clock();
-
-renderer.setAnimationLoop(() => {
-  const f = appState.selectedAnimation.render;
-  // Calculate delta as close to func call
-  const timeDelta = clock.getDelta();
-  f(mesh, timeDelta);
-  renderer.render(scene, camera);
-});
-
-function mapSelectionToFunction(input: string): any {
-  if (input == SIMPLE_GRAVITY) {
-    return simpleGravity;
-  } else if (input == RUBBER_BANDING) {
-    return rubberBanding;
-  } else if (input == SCROLLVIEW) {
-    // TODO: scrollview
-    return null;
-  } else {
-    console.log("error on mapping, returning default. got ", input);
-    return simpleGravity;
-  }
 }

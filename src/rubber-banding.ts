@@ -6,7 +6,7 @@ enum ANIM_STATE {
 }
 
 // Consts
-const floorY = -100;
+const floorY = 0;
 // const ceilY = 200;
 // const EPS = 0.0000001;
 
