@@ -43,8 +43,6 @@ class RubberBandingAnimation {
         this.acceleration = 0;
       }
     } else {
-      /// f = m * a
-      // const currentF = mass * this.acceleration;
       const x = floorY - mesh.position.y;
       let springF = this.k * x;
       const dampingF = this.c * this.velocity;
