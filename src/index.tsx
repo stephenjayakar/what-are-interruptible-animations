@@ -25,6 +25,7 @@ const clock = new THREE.Clock();
 var renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(width, height);
 document.body.appendChild(renderer.domElement);
+let f = rubberBanding.render;
 
 const textureLoader = new THREE.TextureLoader();
 var mesh: THREE.Mesh | null = null;
@@ -37,22 +38,12 @@ textureLoader.load(settingsImage, (texture) => {
   scene.add(mesh);
 
   renderer.setAnimationLoop(() => {
-    if (!isBeingDragged) {
-      const f = appState.selectedAnimation.render;
-      // Calculate delta as close to func call
-      const timeDelta = clock.getDelta();
-      f(mesh, timeDelta);
-      renderer.render(scene, camera);
-    }
+    // Calculate delta as close to func call
+    const timeDelta = clock.getDelta();
+    f(mesh, timeDelta);
+    renderer.render(scene, camera);
   });
 });
-
-// TODO: make this component state
-const appState: {
-  selectedAnimation: RenderClass;
-} = {
-  selectedAnimation: rubberBanding,
-};
 
 function App() {
   const [massSliderValue, setMassSliderValue] = React.useState(1);
@@ -65,7 +56,7 @@ function App() {
 
   function handleSliderChange(value: string, key: "mass" | "k") {
     const floatValue = parseInt(value) / 10;
-    appState.selectedAnimation.updateConfig({
+    rubberBanding.updateConfig({
       [key]: floatValue,
     });
     sliderMap[key](floatValue);
@@ -77,7 +68,7 @@ function App() {
       <button
         id="resetButton"
         onClick={() => {
-          appState.selectedAnimation.reset(mesh);
+          rubberBanding.reset(mesh);
         }}
       >
         Reset
@@ -111,6 +102,7 @@ let isBeingDragged = false;
 // Mouse down event
 const onMouseDown = (event: MouseEvent) => {
   isBeingDragged = true;
+  f = emptyRenderMethod;
   console.log("Mouse down:", event);
 };
 
@@ -118,6 +110,7 @@ const onMouseDown = (event: MouseEvent) => {
 const onMouseUp = (event: MouseEvent) => {
   isBeingDragged = false;
   console.log("Mouse up:", event);
+  f = rubberBanding.render;
   clock.getDelta();
 };
 
@@ -137,3 +130,5 @@ interface RenderClass {
   reset: (mesh: THREE.Mesh, config?: any) => void;
   updateConfig: (config: any) => void;
 }
+
+function emptyRenderMethod(_: THREE.Mesh, __: number): void {}
