@@ -8,8 +8,8 @@ import * as React from "react";
 var scene = new THREE.Scene();
 
 var width = 1170 / 2;
-// 19.5 / 9
-var height = 4197 / 2;
+// Random google ratio for screen height that's similar to iPhone
+var height = (19.5 / 9) * width;
 
 var camera = new THREE.OrthographicCamera(
   width / -2,
@@ -29,8 +29,8 @@ const textureLoader = new THREE.TextureLoader();
 var mesh: THREE.Mesh | null = null;
 textureLoader.load(settingsImage, (texture) => {
 
-  
-    var geometry = new THREE.PlaneGeometry(width, height);
+  const textureHeight = 4197 / 2;
+    var geometry = new THREE.PlaneGeometry(width, textureHeight);
     var material = new THREE.MeshBasicMaterial({ map: texture });
 
     mesh = new THREE.Mesh(geometry, material);
@@ -105,6 +105,10 @@ function App() {
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(<App />);
+
+renderer.domElement.addEventListener('mousedown', (event) => {
+  console.log(event)
+}, false);
 
 interface RenderClass {
   render: (mesh: THREE.Mesh, timeDelta: number) => void;
